@@ -25,6 +25,8 @@ npm install
 # 3. Buat file .env (jika belum ada)
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxx
+# (Opsional) Untuk validasi email saat login. Dapatkan dari Supabase Dashboard → Project Settings → API → service_role key
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # 4. Jalankan migrasi database
 #    Buka Supabase Dashboard → SQL Editor → paste isi supabase/migrations/0002_add_packages_audit_roles.sql → Run
@@ -49,7 +51,10 @@ npm run dev
 | `npm run typecheck` | Type-check (tsc --noEmit) |
 | `npm test`         | Unit test (Vitest)         |
 | `npm run test:watch` | Test mode watch          |
-| `npm run ci`       | Type-check + lint + test   |
+| `npm run test:api` | API integration test       |
+| `npm run test:e2e` | E2E test (Playwright, headless) |
+| `npm run test:e2e:ui` | E2E test (with browser) |
+| `npm run ci`       | Type-check + lint + unit test |
 
 ---
 
@@ -162,15 +167,15 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 ### ✅ Selesai
 
-**Testing & CI/CD**
+**Testing**
 - [x] Unit test untuk utils (formatCurrency, formatDate, dll)
 - [x] Unit test untuk validasi booking
-- [x] GitHub Actions CI (type-check + lint + test tiap push/PR)
+- [x] Integration test (API endpoints via HTTP)
+- [x] End-to-end test (Playwright — register, booking, status)
 
-### ❌ Belum
-
-- [ ] Integration test (API endpoints dengan Supabase)
-- [ ] End-to-end test (Playwright)
+**CI/CD**
+- [x] GitHub Actions CI (type-check + lint + unit test tiap push/PR)
+- [ ] Deploy preview di Vercel dari PR
 
 ---
 

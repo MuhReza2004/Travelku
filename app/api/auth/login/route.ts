@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerSupabase, createServiceRoleSupabase } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();
@@ -11,6 +11,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const admin = createServiceRoleSupabase();
+  const { data: allUsers } = await admin.auth.admin.listUsers();
+  const userExists = allUsers?.users?.some((u) => u.email === email);
+
+  if (!userExists) {
+    return NextResponse.json(
+      { error: "Email tidak terdaftar" },
+      { status: 404 }
+    );
+  }
+
   const supabase = await createServerSupabase();
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -19,7 +30,7 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    return NextResponse.json({ error: "Password salah" }, { status: 401 });
   }
 
   const { data: staff } = await supabase
