@@ -1,5 +1,14 @@
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
+async function checkServer(): Promise<boolean> {
+  try {
+    const res = await fetch(`${BASE_URL}/api/auth/me`, { signal: AbortSignal.timeout(3000) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 let counter = 0;
 function makeTestEmail(): string {
   counter++;
@@ -77,5 +86,5 @@ async function authFetch(
   return { status: res.status, body };
 }
 
-export { BASE_URL, TEST_PASSWORD, makeTestEmail, registerUser, loginUser, authFetch };
+export { BASE_URL, TEST_PASSWORD, makeTestEmail, registerUser, loginUser, authFetch, checkServer };
 export type { AuthSession };

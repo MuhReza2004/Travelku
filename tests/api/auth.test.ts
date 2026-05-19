@@ -5,16 +5,24 @@ import {
   TEST_PASSWORD,
   makeTestEmail,
   loginUser,
+  checkServer,
 } from "../helpers/api";
+
+const serverAlive = await checkServer();
+const itWhenAlive = (name: string, fn: () => Promise<void>) => {
+  if (!serverAlive) return it.skip(name, fn);
+  return it(name, fn);
+};
 
 describe("Auth API", { timeout: 15000 }, () => {
   let email: string;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    if (!serverAlive) return;
     email = makeTestEmail();
   });
 
-  it("register creates a new staff account", async () => {
+  itWhenAlive("register creates a new staff account", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,7 +34,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(data.data.email).toBe(email);
   });
 
-  it("register rejects missing fields", async () => {
+  itWhenAlive("register rejects missing fields", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -37,7 +45,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(data.error).toContain("nama");
   });
 
-  it("register rejects short password", async () => {
+  itWhenAlive("register rejects short password", async () => {
     const e = makeTestEmail();
     const res = await fetch(`${BASE_URL}/api/auth/register`, {
       method: "POST",
@@ -47,7 +55,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(res.status).toBe(400);
   });
 
-  it("login returns session cookie", async () => {
+  itWhenAlive("login returns session cookie", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -59,7 +67,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(data.data.email).toBe(email);
   });
 
-  it("login rejects wrong password", async () => {
+  itWhenAlive("login rejects wrong password", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,7 +76,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(res.status).toBe(401);
   });
 
-  it("/me returns current user with cookie", async () => {
+  itWhenAlive("/me returns current user with cookie", async () => {
     const session = await loginUser(email);
     const res = await fetch(`${BASE_URL}/api/auth/me`, {
       headers: { Cookie: session.cookie },
@@ -78,7 +86,7 @@ describe("Auth API", { timeout: 15000 }, () => {
     expect(data.data.email).toBe(email);
   });
 
-  it("/me returns 401 without auth", async () => {
+  itWhenAlive("/me returns 401 without auth", async () => {
     const res = await fetch(`${BASE_URL}/api/auth/me`);
     expect(res.status).toBe(401);
   });

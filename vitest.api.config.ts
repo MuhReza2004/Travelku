@@ -3,12 +3,14 @@ import path from "path";
 
 export default defineConfig({
   test: {
-    environment: "jsdom",
+    environment: "node",
     globals: true,
     pool: "forks",
-    exclude: ["node_modules", "tests/e2e", "tests/api"],
+    include: ["tests/api/**/*.test.ts"],
+    testTimeout: 30000,
     env: {
       BASE_URL: "http://localhost:3000",
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
     },
   },
   resolve: {

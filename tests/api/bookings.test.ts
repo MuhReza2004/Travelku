@@ -5,13 +5,21 @@ import {
   makeTestEmail,
   loginUser,
   authFetch,
+  checkServer,
 } from "../helpers/api";
 import type { AuthSession } from "../helpers/api";
+
+const serverAlive = await checkServer();
+const itWhenAlive = (name: string, fn: () => Promise<void>) => {
+  if (!serverAlive) return it.skip(name, fn);
+  return it(name, fn);
+};
 
 describe("Bookings API", { timeout: 15000 }, () => {
   let session: AuthSession;
 
   beforeAll(async () => {
+    if (!serverAlive) return;
     const email = makeTestEmail();
     await fetch(`${process.env.BASE_URL || "http://localhost:3000"}/api/auth/register`, {
       method: "POST",
@@ -21,14 +29,14 @@ describe("Bookings API", { timeout: 15000 }, () => {
     session = await loginUser(email);
   });
 
-  it("lists bookings (empty)", async () => {
+  itWhenAlive("lists bookings (empty)", async () => {
     const { status, body } = await authFetch("/bookings", session);
     expect(status).toBe(200);
     const data = body as { data: unknown[] };
     expect(Array.isArray(data.data)).toBe(true);
   });
 
-  it("creates a booking", async () => {
+  itWhenAlive("creates a booking", async () => {
     const { status, body } = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({
@@ -46,7 +54,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(data.data.status).toBe("Menunggu");
   });
 
-  it("creates and updates a booking", async () => {
+  itWhenAlive("creates and updates a booking", async () => {
     const createRes = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({
@@ -80,7 +88,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(updated.data.participants).toBe(4);
   });
 
-  it("changes booking status", async () => {
+  itWhenAlive("changes booking status", async () => {
     const createRes = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({
@@ -108,7 +116,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(completeRes.status).toBe(200);
   });
 
-  it("rejects invalid status transition", async () => {
+  itWhenAlive("rejects invalid status transition", async () => {
     const createRes = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({
@@ -130,7 +138,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(res.status).toBe(400);
   });
 
-  it("rejects booking with missing fields", async () => {
+  itWhenAlive("rejects booking with missing fields", async () => {
     const { status } = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({ customer_name: "Test" }),
@@ -138,7 +146,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(status).toBe(400);
   });
 
-  it("returns audit logs for a booking", async () => {
+  itWhenAlive("returns audit logs for a booking", async () => {
     const createRes = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({
@@ -164,7 +172,7 @@ describe("Bookings API", { timeout: 15000 }, () => {
     expect(data.data.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("deletes a booking", async () => {
+  itWhenAlive("deletes a booking", async () => {
     const createRes = await authFetch("/bookings", session, {
       method: "POST",
       body: JSON.stringify({

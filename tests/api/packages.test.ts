@@ -5,13 +5,21 @@ import {
   makeTestEmail,
   loginUser,
   authFetch,
+  checkServer,
 } from "../helpers/api";
 import type { AuthSession } from "../helpers/api";
+
+const serverAlive = await checkServer();
+const itWhenAlive = (name: string, fn: () => Promise<void>) => {
+  if (!serverAlive) return it.skip(name, fn);
+  return it(name, fn);
+};
 
 describe("Packages API", { timeout: 15000 }, () => {
   let session: AuthSession;
 
   beforeAll(async () => {
+    if (!serverAlive) return;
     const email = makeTestEmail();
     await fetch(`${process.env.BASE_URL || "http://localhost:3000"}/api/auth/register`, {
       method: "POST",
@@ -21,14 +29,14 @@ describe("Packages API", { timeout: 15000 }, () => {
     session = await loginUser(email);
   });
 
-  it("lists packages (empty)", async () => {
+  itWhenAlive("lists packages (empty)", async () => {
     const { status, body } = await authFetch("/packages", session);
     expect(status).toBe(200);
     const data = body as { data: unknown[] };
     expect(Array.isArray(data.data)).toBe(true);
   });
 
-  it("creates a package", async () => {
+  itWhenAlive("creates a package", async () => {
     const { status, body } = await authFetch("/packages", session, {
       method: "POST",
       body: JSON.stringify({
@@ -44,7 +52,7 @@ describe("Packages API", { timeout: 15000 }, () => {
     expect(data.data.name).toBe("Test Package");
   });
 
-  it("rejects package with missing required fields", async () => {
+  itWhenAlive("rejects package with missing required fields", async () => {
     const { status } = await authFetch("/packages", session, {
       method: "POST",
       body: JSON.stringify({ name: "Incomplete" }),

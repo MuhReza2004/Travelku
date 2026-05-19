@@ -42,19 +42,19 @@ npm run dev
 
 ### Perintah lain
 
-| Perintah           | Fungsi                     |
-| ------------------ | -------------------------- |
-| `npm run dev`      | Dev server (port 3000)     |
-| `npm run build`    | Build produksi             |
-| `npm run start`    | Jalankan production server |
-| `npm run lint`     | ESLint                     |
-| `npm run typecheck` | Type-check (tsc --noEmit) |
-| `npm test`         | Unit test (Vitest)         |
-| `npm run test:watch` | Test mode watch          |
-| `npm run test:api` | API integration test       |
-| `npm run test:e2e` | E2E test (Playwright, headless) |
-| `npm run test:e2e:ui` | E2E test (with browser) |
-| `npm run ci`       | Type-check + lint + unit test |
+| Perintah              | Fungsi                          |
+| --------------------- | ------------------------------- |
+| `npm run dev`         | Dev server (port 3000)          |
+| `npm run build`       | Build produksi                  |
+| `npm run start`       | Jalankan production server      |
+| `npm run lint`        | ESLint                          |
+| `npm run typecheck`   | Type-check (tsc --noEmit)       |
+| `npm test`            | Unit test (Vitest)              |
+| `npm run test:watch`  | Test mode watch                 |
+| `npm run test:api`    | API integration test            |
+| `npm run test:e2e`    | E2E test (Playwright, headless) |
+| `npm run test:e2e:ui` | E2E test (with browser)         |
+| `npm run ci`          | Type-check + lint + unit test   |
 
 ---
 
@@ -168,14 +168,18 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 ### ✅ Selesai
 
 **Testing**
+
 - [x] Unit test untuk utils (formatCurrency, formatDate, dll)
 - [x] Unit test untuk validasi booking
 - [x] Integration test (API endpoints via HTTP)
 - [x] End-to-end test (Playwright — register, booking, status)
 
 **CI/CD**
+
 - [x] GitHub Actions CI (type-check + lint + unit test tiap push/PR)
-- [ ] Deploy preview di Vercel dari PR
+- [x] Deploy preview di Vercel dari PR
+
+link domain deploy:https://travelku-seven.vercel.app/auth/login
 
 ---
 
