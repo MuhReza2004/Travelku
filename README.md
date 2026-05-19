@@ -40,25 +40,28 @@ npm run dev
 
 ### Perintah lain
 
-| Perintah | Fungsi |
-|----------|--------|
-| `npm run dev` | Dev server (port 3000) |
-| `npm run build` | Build produksi |
-| `npm run start` | Jalankan production server |
-| `npm run lint` | ESLint |
-| `npx tsc --noEmit` | Type-check |
+| Perintah           | Fungsi                     |
+| ------------------ | -------------------------- |
+| `npm run dev`      | Dev server (port 3000)     |
+| `npm run build`    | Build produksi             |
+| `npm run start`    | Jalankan production server |
+| `npm run lint`     | ESLint                     |
+| `npm run typecheck` | Type-check (tsc --noEmit) |
+| `npm test`         | Unit test (Vitest)         |
+| `npm run test:watch` | Test mode watch          |
+| `npm run ci`       | Type-check + lint + test   |
 
 ---
 
 ## Stack & Alasan
 
-| Teknologi | Alasan |
-|-----------|--------|
-| **Next.js 16 (App Router)** | React full-stack, routing built-in, middleware untuk auth |
-| **TypeScript 5** | Type safety, maintainability jangka panjang |
-| **Tailwind CSS v4** | Utility-first, styling cepat tanpa file CSS terpisah |
-| **Supabase** | Backend-as-a-Service: database Postgres, auth, RLS — gratis untuk prototyping |
-| **@supabase/ssr** | Cookie-based session management untuk Next.js App Router |
+| Teknologi                   | Alasan                                                                        |
+| --------------------------- | ----------------------------------------------------------------------------- |
+| **Next.js 16 (App Router)** | React full-stack, routing built-in, middleware untuk auth                     |
+| **TypeScript 5**            | Type safety, maintainability jangka panjang                                   |
+| **Tailwind CSS v4**         | Utility-first, styling cepat tanpa file CSS terpisah                          |
+| **Supabase**                | Backend-as-a-Service: database Postgres, auth, RLS — gratis untuk prototyping |
+| **@supabase/ssr**           | Cookie-based session management untuk Next.js App Router                      |
 
 ### Arsitektur
 
@@ -74,22 +77,22 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 ## REST API
 
-| Method | Path | Auth | Deskripsi |
-|--------|------|------|-----------|
-| POST | `/api/auth/register` | ✗ | Daftar staf baru |
-| POST | `/api/auth/login` | ✗ | Login (set session cookie) |
-| POST | `/api/auth/logout` | ✓ | Hapus session |
-| GET | `/api/auth/me` | ✓ | Profile staf saat ini |
-| GET | `/api/bookings` | ✓ | List booking (filter, search, pagination via query params) |
-| POST | `/api/bookings` | ✓ | Buat booking baru |
-| GET | `/api/bookings/[id]` | ✓ | Detail booking |
-| PUT | `/api/bookings/[id]` | ✓ | Update booking (hanya admin atau pemilik) |
-| DELETE | `/api/bookings/[id]` | ✓ | Hapus booking (hanya admin atau pemilik) |
-| PATCH | `/api/bookings/[id]/status` | ✓ | Ubah status (validasi flow) |
-| GET | `/api/packages` | ✓ | List paket wisata |
-| POST | `/api/packages` | ✓ | Buat paket (admin only) |
-| PUT | `/api/packages/[id]` | ✓ | Update paket (admin only) |
-| DELETE | `/api/packages/[id]` | ✓ | Hapus paket (admin only) |
+| Method | Path                        | Auth | Deskripsi                                                  |
+| ------ | --------------------------- | ---- | ---------------------------------------------------------- |
+| POST   | `/api/auth/register`        | ✗    | Daftar staf baru                                           |
+| POST   | `/api/auth/login`           | ✗    | Login (set session cookie)                                 |
+| POST   | `/api/auth/logout`          | ✓    | Hapus session                                              |
+| GET    | `/api/auth/me`              | ✓    | Profile staf saat ini                                      |
+| GET    | `/api/bookings`             | ✓    | List booking (filter, search, pagination via query params) |
+| POST   | `/api/bookings`             | ✓    | Buat booking baru                                          |
+| GET    | `/api/bookings/[id]`        | ✓    | Detail booking                                             |
+| PUT    | `/api/bookings/[id]`        | ✓    | Update booking (hanya admin atau pemilik)                  |
+| DELETE | `/api/bookings/[id]`        | ✓    | Hapus booking (hanya admin atau pemilik)                   |
+| PATCH  | `/api/bookings/[id]/status` | ✓    | Ubah status (validasi flow)                                |
+| GET    | `/api/packages`             | ✓    | List paket wisata                                          |
+| POST   | `/api/packages`             | ✓    | Buat paket (admin only)                                    |
+| PUT    | `/api/packages/[id]`        | ✓    | Update paket (admin only)                                  |
+| DELETE | `/api/packages/[id]`        | ✓    | Hapus paket (admin only)                                   |
 
 ---
 
@@ -98,6 +101,7 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 ### ✅ Selesai
 
 **Auth**
+
 - [x] Registrasi staf baru (nama, email, password)
 - [x] Login dengan email/password
 - [x] Logout
@@ -108,6 +112,7 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Role staf: admin dan staff — disimpan di tabel `staff`
 
 **Manajemen Pemesanan (CRUD)**
+
 - [x] Tambah pemesanan baru — otomatis status "Menunggu"
 - [x] Lihat daftar pemesanan (tabel, urut terbaru di atas)
 - [x] Edit pemesanan
@@ -116,43 +121,56 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Final state (Selesai/Dibatalkan) tidak bisa diubah
 
 **Filter & Pencarian**
+
 - [x] Filter berdasarkan status
 - [x] Filter berdasarkan paket wisata (partial match)
 - [x] Filter berdasarkan rentang tanggal keberangkatan
 - [x] Pencarian berdasarkan nama pemesan / kontak (partial match)
 
 **Ringkasan**
+
 - [x] Total pemesanan
 - [x] Estimasi pendapatan (hanya Dikonfirmasi + Selesai)
 - [x] Count per status
 - [x] Semua ringkasan mengikuti filter aktif
 
 **Paket Wisata**
+
 - [x] CRUD paket wisata (admin: semua; staff: read-only)
 - [x] Tabel paket dengan daftar, harga, kapasitas
 - [x] Dropdown pemilihan paket di form booking (auto-fill harga)
 - [x] Validasi kapasitas paket sebelum booking (menghitung all confirmed bookings)
 
 **Audit Log**
+
 - [x] Riwayat siapa membuat/mengubah/menghapus booking
 - [x] Catat perubahan sebelum/sesudah tiap update
 - [x] Log otomatis untuk tiap transisi status
 
 **Role & Akses**
+
 - [x] Admin: akses penuh ke semua fitur termasuk CRUD paket
 - [x] Staff: hanya bisa edit/hapus booking milik sendiri
 - [x] Status change: admin bisa ubah status booking siapa pun, staff hanya booking sendiri
 
 **Lain-lain**
+
 - [x] Validasi input sisi server (peserta ≥ 1, harga ≥ 0, tanggal tidak lampau, kontak wajib)
 - [x] Pagination (20 per halaman)
 - [x] Export daftar ke CSV
 - [x] Tampilan responsive (mobile-friendly)
 
+### ✅ Selesai
+
+**Testing & CI/CD**
+- [x] Unit test untuk utils (formatCurrency, formatDate, dll)
+- [x] Unit test untuk validasi booking
+- [x] GitHub Actions CI (type-check + lint + test tiap push/PR)
+
 ### ❌ Belum
 
-- [ ] Unit test / integration test
-- [ ] CI/CD pipeline
+- [ ] Integration test (API endpoints dengan Supabase)
+- [ ] End-to-end test (Playwright)
 
 ---
 
