@@ -11,15 +11,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const admin = createServiceRoleSupabase();
-  const { data: allUsers } = await admin.auth.admin.listUsers();
-  const userExists = allUsers?.users?.some((u) => u.email === email);
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const admin = createServiceRoleSupabase();
+    const { data: allUsers } = await admin.auth.admin.listUsers();
+    const userExists = allUsers?.users?.some((u) => u.email === email);
 
-  if (!userExists) {
-    return NextResponse.json(
-      { error: "Email tidak terdaftar" },
-      { status: 404 }
-    );
+    if (!userExists) {
+      return NextResponse.json(
+        { error: "Email tidak terdaftar" },
+        { status: 404 }
+      );
+    }
   }
 
   const supabase = await createServerSupabase();
