@@ -162,24 +162,18 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 - [x] Validasi input sisi server (peserta ≥ 1, harga ≥ 0, tanggal tidak lampau, kontak wajib)
 - [x] Pagination (20 per halaman)
-- [x] Export daftar ke CSV
+- [x] Export daftar ke XLSX (format tabel, bold header, border, rata kanan harga)
 - [x] Tampilan responsive (mobile-friendly)
 
-### ✅ Selesai
+### ✅ Testing & CI/CD
 
-**Testing**
+- [x] Unit test utils & validasi (20 test, Vitest, tanpa server)
+- [x] Integration test API endpoints (18 test via HTTP, skip otomatis jika server mati)
+- [x] End-to-end test dengan Playwright (register → login → booking → status)
+- [x] GitHub Actions CI (type-check + lint + unit test tiap push/PR ke main)
+- [x] Deploy preview otomatis di Vercel dari PR
 
-- [x] Unit test untuk utils (formatCurrency, formatDate, dll)
-- [x] Unit test untuk validasi booking
-- [x] Integration test (API endpoints via HTTP)
-- [x] End-to-end test (Playwright — register, booking, status)
-
-**CI/CD**
-
-- [x] GitHub Actions CI (type-check + lint + unit test tiap push/PR)
-- [x] Deploy preview di Vercel dari PR
-
-link domain deploy:https://travelku-seven.vercel.app/auth/login
+[travelku-seven.vercel.app](https://travelku-seven.vercel.app/auth/login) — domain deploy
 
 ---
 
@@ -195,7 +189,7 @@ link domain deploy:https://travelku-seven.vercel.app/auth/login
 
 5. **Pagination 20 per halaman.** Ukuran halaman bisa diubah via query parameter `page_size` (maks 100).
 
-6. **Tidak ada test framework.** Belum ada unit test atau integration test. Disarankan menambahkan Vitest + Playwright untuk proyek production.
+6. **Testing dengan Vitest + Playwright.** Unit test (20 test) berjalan tanpa server. API test (18 test) butuh dev server, skip otomatis jika server tidak aktif. E2E test auto-start dev server via Playwright webServer config.
 
 ---
 
