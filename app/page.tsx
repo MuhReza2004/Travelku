@@ -19,6 +19,7 @@ import { BookingFormDialog } from "@/components/bookings/booking-form";
 import { ConfirmDialog } from "@/components/bookings/confirm-dialog";
 import { AuditLogDialog } from "@/components/bookings/audit-log-dialog";
 import { PackagesTab } from "@/components/packages/packages-tab";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const PAGE_SIZE = 20;
 
@@ -242,60 +243,66 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2 sm:px-6 sm:py-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <h1 className="text-lg sm:text-xl font-bold text-zinc-900">TravelKu</h1>
-            <span className="hidden sm:inline text-sm text-zinc-400">|</span>
-            <span className="hidden sm:inline text-sm text-zinc-500">
-              {tab === "bookings" ? "Pemesanan" : "Paket Wisata"}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            {staff && (
-              <span className="hidden sm:inline text-sm text-zinc-500">
-                {staff.name}
-                {staff.role === "admin" && (
-                  <span className="ml-1.5 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600">
-                    admin
-                  </span>
-                )}
-              </span>
-            )}
-            <button
-              onClick={handleLogout}
-              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-            >
-              Keluar
-            </button>
-          </div>
-        </div>
-
-        <div className="border-t border-zinc-100">
-          <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
-            <div className="flex gap-0">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors">
+      <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+              <h1 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">TravelKu</h1>
+            </div>
+            <nav className="flex gap-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 p-0.5" role="tablist">
               <button
                 onClick={() => setTab("bookings")}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                role="tab"
+                aria-selected={tab === "bookings"}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
                   tab === "bookings"
-                    ? "border-blue-600 text-blue-700"
-                    : "border-transparent text-zinc-500 hover:text-zinc-700"
+                    ? "bg-white dark:bg-zinc-700 text-blue-700 dark:text-blue-400 shadow-sm"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                 }`}
               >
                 Pemesanan
               </button>
               <button
                 onClick={() => setTab("packages")}
-                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+                role="tab"
+                aria-selected={tab === "packages"}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
                   tab === "packages"
-                    ? "border-blue-600 text-blue-700"
-                    : "border-transparent text-zinc-500 hover:text-zinc-700"
+                    ? "bg-white dark:bg-zinc-700 text-blue-700 dark:text-blue-400 shadow-sm"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                 }`}
               >
                 Paket Wisata
               </button>
-            </div>
+            </nav>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            {staff && (
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1">
+                  <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white">
+                    {staff.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{staff.name}</span>
+                  {staff.role === "admin" && (
+                    <span className="rounded bg-amber-100 dark:bg-amber-900/50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-400">
+                      admin
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            <button
+              onClick={handleLogout}
+              className="rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors"
+            >
+              Keluar
+            </button>
           </div>
         </div>
       </header>
@@ -304,28 +311,36 @@ export default function HomePage() {
         {tab === "bookings" ? (
           <>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h2 className="text-lg font-semibold text-zinc-800">
-                Daftar Pemesanan
-                {!ready && (
-                  <span className="ml-2 text-sm font-normal text-zinc-400">Memuat...</span>
-                )}
-              </h2>
+              <div>
+                <h2 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
+                  Daftar Pemesanan
+                  {total > 0 && (
+                    <span className="ml-2 text-sm font-normal text-zinc-400 dark:text-zinc-500">
+                      {ready ? `${total} pemesanan` : "Memuat..."}
+                    </span>
+                  )}
+                </h2>
+              </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleExportExcel}
                   disabled={bookings.length === 0}
-                  className="rounded-md border border-zinc-300 bg-white px-2.5 py-2 sm:px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   title="Export Excel"
                 >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
                   <span className="hidden sm:inline">Export Excel</span>
-                  <span className="sm:hidden" aria-hidden="true">⬇</span>
                 </button>
                 <button
                   onClick={() => { setEditingBooking(undefined); setFormOpen(true); }}
-                  className="rounded-md bg-blue-600 px-3 py-2 sm:px-4 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 px-3 py-2 text-sm font-medium text-white transition-colors shadow-sm"
                 >
-                  <span className="sm:hidden">+ Baru</span>
-                  <span className="hidden sm:inline">+ Tambah Pemesanan</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  <span> Tambah</span>
                 </button>
               </div>
             </div>
@@ -338,8 +353,12 @@ export default function HomePage() {
             />
 
             {!ready ? (
-              <div className="flex items-center justify-center py-12 text-zinc-400">
-                Memuat data...
+              <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-500">
+                <svg className="w-8 h-8 mb-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <p className="text-sm">Memuat data...</p>
               </div>
             ) : (
               <>
@@ -353,25 +372,31 @@ export default function HomePage() {
                 />
 
                 {totalPages > 1 && (
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-zinc-600">
-                    <span className="text-xs sm:text-sm">
-                      {filters.page * filters.page_size + 1}–
-                      {Math.min((filters.page + 1) * filters.page_size, total)} / {total}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-3">
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      Menampilkan {filters.page * filters.page_size + 1}–
+                      {Math.min((filters.page + 1) * filters.page_size, total)} dari {total}
                     </span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => goToPage(Math.max(0, filters.page - 1))}
                         disabled={filters.page === 0}
-                        className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        ← Sebelumnya
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                        Sebelumnya
                       </button>
                       <button
                         onClick={() => goToPage(Math.min(totalPages - 1, filters.page + 1))}
                         disabled={filters.page >= totalPages - 1}
-                        className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs sm:text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        Selanjutnya →
+                        Selanjutnya
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
                       </button>
                     </div>
                   </div>
@@ -381,7 +406,6 @@ export default function HomePage() {
           </>
         ) : (
           <>
-            <h2 className="text-lg font-semibold text-zinc-800">Daftar Paket Wisata</h2>
             <PackagesTab
               staffRole={staff?.role ?? "staff"}
             />

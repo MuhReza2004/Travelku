@@ -93,15 +93,15 @@ export function BookingFormDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-lg mx-4 rounded-xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60">
+      <div className="w-full max-w-lg mx-4 rounded-xl bg-white dark:bg-zinc-900 p-6 shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900">
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {booking ? "Edit Pemesanan" : "Tambah Pemesanan Baru"}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:text-zinc-600"
+            className="rounded-md p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -110,7 +110,7 @@ export function BookingFormDialog({
         </div>
 
         {getError("root") && (
-          <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700 ring-1 ring-red-200">
+          <div className="mb-4 rounded-md bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-700 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-800">
             {getError("root")}
           </div>
         )}
@@ -157,10 +157,10 @@ export function BookingFormDialog({
                 type="button"
                 onClick={() => setShowPackageDropdown(!showPackageDropdown)}
                 className={`w-full rounded-md border px-3 py-2 text-sm text-left flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  getError("package_name") ? "border-red-400" : "border-zinc-300"
-                }`}
+                  getError("package_name") ? "border-red-400 dark:border-red-500" : "border-zinc-300 dark:border-zinc-600"
+                } bg-white dark:bg-zinc-800`}
               >
-                <span className={packageName ? "text-zinc-900" : "text-zinc-400"}>
+                <span className={packageName ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 dark:text-zinc-500"}>
                   {packageName || "Pilih paket atau ketik manual..."}
                 </span>
                 <svg className="h-4 w-4 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -174,7 +174,7 @@ export function BookingFormDialog({
               {showPackageDropdown && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowPackageDropdown(false)} />
-                  <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg max-h-48 overflow-y-auto">
+                  <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-lg max-h-48 overflow-y-auto">
                     <input
                       type="text"
                       placeholder="Ketik manual..."
@@ -183,28 +183,28 @@ export function BookingFormDialog({
                         setPackageId("");
                         setPackageName(e.target.value);
                       }}
-                      className="w-full border-b border-zinc-200 px-3 py-2 text-sm focus:outline-none"
+                      className="w-full border-b border-zinc-200 dark:border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none"
                       autoFocus
                     />
                     {packages.length === 0 ? (
-                      <p className="px-3 py-2 text-sm text-zinc-400">Tidak ada paket</p>
+                      <p className="px-3 py-2 text-sm text-zinc-400 dark:text-zinc-500">Tidak ada paket</p>
                     ) : (
                       packages.map((pkg) => (
                         <button
                           key={pkg.id}
                           type="button"
                           onClick={() => selectPackage(pkg)}
-                          className={`w-full px-3 py-2 text-left text-sm hover:bg-zinc-50 flex items-center justify-between ${
-                            pkg.id === packageId ? "bg-blue-50" : ""
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center justify-between ${
+                            pkg.id === packageId ? "bg-blue-50 dark:bg-blue-900/30" : ""
                           }`}
                         >
                           <div>
-                            <span className="font-medium text-zinc-900">{pkg.name}</span>
-                            <span className="ml-2 text-zinc-500 text-xs">
+                            <span className="font-medium text-zinc-900 dark:text-zinc-100">{pkg.name}</span>
+                            <span className="ml-2 text-zinc-500 dark:text-zinc-400 text-xs">
                               {pkg.destination} · {pkg.duration}
                             </span>
                           </div>
-                          <span className="text-xs text-zinc-400">
+                          <span className="text-xs text-zinc-400 dark:text-zinc-500">
                             {formatCurrency(pkg.price)}
                           </span>
                         </button>
@@ -274,7 +274,7 @@ export function BookingFormDialog({
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -283,7 +283,7 @@ export function BookingFormDialog({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="rounded-md px-4 py-2 text-sm font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 disabled:opacity-50"
+              className="rounded-md px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 ring-1 ring-inset ring-zinc-300 dark:ring-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-50"
             >
               Batal
             </button>
@@ -314,7 +314,7 @@ function Label({
     <label
       htmlFor={htmlFor}
       className={`mb-1 block text-sm font-medium ${
-        error ? "text-red-600" : "text-zinc-700"
+        error ? "text-red-600 dark:text-red-400" : "text-zinc-700 dark:text-zinc-300"
       }`}
     >
       {children}
@@ -323,11 +323,11 @@ function Label({
 }
 
 function FieldErrorMsg({ message }: { message: string }) {
-  return <p className="mt-1 text-xs text-red-600">{message}</p>;
+  return <p className="mt-1 text-xs text-red-600 dark:text-red-400">{message}</p>;
 }
 
 function inputClass(error: boolean) {
-  return `w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-    error ? "border-red-400 ring-red-300" : "border-zinc-300"
+  return `w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 ${
+    error ? "border-red-400 dark:border-red-500 ring-red-300" : "border-zinc-300 dark:border-zinc-600"
   }`;
 }

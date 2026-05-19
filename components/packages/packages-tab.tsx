@@ -98,7 +98,7 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-zinc-400">
+      <div className="flex items-center justify-center py-12 text-zinc-400 dark:text-zinc-500">
         Memuat data...
       </div>
     );
@@ -107,7 +107,7 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-zinc-500">{packages.length} paket tersedia</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">{packages.length} paket tersedia</p>
         <button
           onClick={() => {
             setEditingPkg(undefined);
@@ -120,16 +120,16 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
       </div>
 
       {packages.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-zinc-300 p-12 text-center">
-          <p className="text-zinc-500">Belum ada paket wisata.</p>
-          <p className="mt-1 text-sm text-zinc-400">
+        <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-12 text-center">
+          <p className="text-zinc-500 dark:text-zinc-400">Belum ada paket wisata.</p>
+          <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
             Klik &quot;Tambah Paket&quot; untuk memulai.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-zinc-200">
-          <table className="min-w-[500px] w-full divide-y divide-zinc-200 text-sm">
-            <thead className="bg-zinc-50">
+        <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-700">
+          <table className="min-w-[500px] w-full divide-y divide-zinc-200 dark:divide-zinc-700 text-sm">
+            <thead className="bg-zinc-50 dark:bg-zinc-800">
               <tr>
                 <Th>Nama Paket</Th>
                 <Th>Destinasi</Th>
@@ -139,14 +139,14 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
                 {staffRole === "admin" && <Th className="text-right">Aksi</Th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 bg-white">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-700 bg-white dark:bg-zinc-900">
               {packages.map((pkg) => (
-                <tr key={pkg.id} className="hover:bg-zinc-50">
-                  <Td className="font-medium text-zinc-900">{pkg.name}</Td>
-                  <Td>{pkg.destination}</Td>
-                  <Td>{pkg.duration}</Td>
-                  <Td>{pkg.capacity} orang</Td>
-                  <Td className="font-semibold">{formatCurrency(pkg.price)}</Td>
+                <tr key={pkg.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                  <Td className="font-medium text-zinc-900 dark:text-zinc-100">{pkg.name}</Td>
+                  <Td className="text-zinc-600 dark:text-zinc-400">{pkg.destination}</Td>
+                  <Td className="text-zinc-600 dark:text-zinc-400">{pkg.duration}</Td>
+                  <Td className="text-zinc-600 dark:text-zinc-400">{pkg.capacity} orang</Td>
+                  <Td className="font-semibold text-zinc-900 dark:text-zinc-100">{formatCurrency(pkg.price)}</Td>
                   {staffRole === "admin" && (
                     <Td className="text-right">
                       <div className="flex justify-end gap-1">
@@ -155,13 +155,13 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
                             setEditingPkg(pkg);
                             setFormOpen(true);
                           }}
-                          className="rounded px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"
+                          className="rounded px-2 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => setDeleteId(pkg.id)}
-                          className="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+                          className="rounded px-2 py-1 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
                         >
                           Hapus
                         </button>
@@ -186,16 +186,16 @@ export function PackagesTab({ staffRole }: PackagesTabProps) {
       />
 
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-sm mx-4 rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold text-zinc-900">Hapus Paket</h3>
-            <p className="mt-2 text-sm text-zinc-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60">
+          <div className="w-full max-w-sm mx-4 rounded-xl bg-white dark:bg-zinc-900 p-6 shadow-xl">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Hapus Paket</h3>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               Apakah Anda yakin ingin menghapus paket ini?
             </p>
             <div className="mt-5 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteId(null)}
-                className="rounded-md px-4 py-2 text-sm font-medium text-zinc-700 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50"
+                className="rounded-md px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 ring-1 ring-inset ring-zinc-300 dark:ring-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 Batal
               </button>
@@ -222,7 +222,7 @@ function Th({
 }) {
   return (
     <th
-      className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 ${className ?? ""}`}
+      className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 ${className ?? ""}`}
     >
       {children}
     </th>
