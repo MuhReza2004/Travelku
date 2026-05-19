@@ -22,11 +22,9 @@ cd travelku
 # 2. Install dependensi
 npm install
 
-# 3. Buat file .env (jika belum ada)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxx
-# (Opsional) Untuk validasi email saat login. Dapatkan dari Supabase Dashboard → Project Settings → API → service_role key
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# 3. Buat file .env (copy dari .env.example)
+cp .env.example .env
+# Lalu isi nilai Supabase URL dan Key dari Dashboard Supabase
 
 # 4. Jalankan migrasi database
 #    Buka Supabase Dashboard → SQL Editor → paste isi supabase/migrations/0002_add_packages_audit_roles.sql → Run
@@ -174,6 +172,10 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Deploy preview otomatis di Vercel dari PR
 
 [travelku-seven.vercel.app](https://travelku-seven.vercel.app/auth/login) — domain deploy
+
+> **Catatan CI:** E2E test butuh `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.  
+> Tambahkan sebagai **Environment variables** di GitHub:  
+> Settings → Secrets and variables → Actions → Variables → `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 ---
 
