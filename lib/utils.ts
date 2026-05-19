@@ -23,6 +23,16 @@ export function formatDateShort(date: string): string {
   }).format(new Date(date));
 }
 
+export function formatDateTime(date: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(date));
+}
+
 export function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
 }

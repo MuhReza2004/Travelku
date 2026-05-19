@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import type { Booking, BookingFormData } from "@/lib/types";
-import { getTodayString } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import type { Booking, BookingFormData, Package } from "@/lib/types";
+import { getTodayString, formatCurrency } from "@/lib/utils";
+import { api } from "@/lib/api/client";
 
 interface BookingFormProps {
   booking?: Booking;
@@ -19,8 +20,10 @@ export function BookingFormDialog({
   onClose,
   onSubmit,
 }: BookingFormProps) {
+  const [packages, setPackages] = useState<Package[]>([]);
   const [customerName, setCustomerName] = useState(booking?.customer_name ?? "");
   const [contact, setContact] = useState(booking?.contact ?? "");
+  const [packageId, setPackageId] = useState(booking?.package_id ?? "");
   const [packageName, setPackageName] = useState(booking?.package_name ?? "");
   const [departureDate, setDepartureDate] = useState(
     booking?.departure_date ?? ""
@@ -36,11 +39,33 @@ export function BookingFormDialog({
     []
   );
   const [submitting, setSubmitting] = useState(false);
+  const [showPackageDropdown, setShowPackageDropdown] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      api
+        .get<{ data: Package[] }>("/packages")
+        .then((res) => setPackages(res.data))
+        .catch(() => setPackages([]));
+    }
+  }, [open]);
 
   if (!open) return null;
 
   const getError = (field: string) =>
     errors.find((e) => e.field === field)?.message;
+
+  const selectPackage = (pkg: Package | null) => {
+    if (pkg) {
+      setPackageId(pkg.id);
+      setPackageName(pkg.name);
+      setPricePerPerson(pkg.price.toString());
+    } else {
+      setPackageId("");
+      setPackageName("");
+    }
+    setShowPackageDropdown(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +75,7 @@ export function BookingFormDialog({
     const result = await onSubmit({
       customer_name: customerName,
       contact,
+      package_id: packageId,
       package_name: packageName,
       departure_date: departureDate,
       participants: parseInt(participants) || 0,
@@ -77,18 +103,8 @@ export function BookingFormDialog({
             onClick={onClose}
             className="rounded-md p-1 text-zinc-400 hover:text-zinc-600"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -102,10 +118,7 @@ export function BookingFormDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
-              <Label
-                htmlFor="customer_name"
-                error={!!getError("customer_name")}
-              >
+              <Label htmlFor="customer_name" error={!!getError("customer_name")}>
                 Nama Pemesan
               </Label>
               <input
@@ -136,27 +149,74 @@ export function BookingFormDialog({
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <Label htmlFor="package_name" error={!!getError("package_name")}>
                 Paket Wisata
               </Label>
-              <input
-                id="package_name"
-                type="text"
-                value={packageName}
-                onChange={(e) => setPackageName(e.target.value)}
-                className={inputClass(!!getError("package_name"))}
-              />
+              <button
+                type="button"
+                onClick={() => setShowPackageDropdown(!showPackageDropdown)}
+                className={`w-full rounded-md border px-3 py-2 text-sm text-left flex items-center justify-between gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  getError("package_name") ? "border-red-400" : "border-zinc-300"
+                }`}
+              >
+                <span className={packageName ? "text-zinc-900" : "text-zinc-400"}>
+                  {packageName || "Pilih paket atau ketik manual..."}
+                </span>
+                <svg className="h-4 w-4 text-zinc-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
               {getError("package_name") && (
                 <FieldErrorMsg message={getError("package_name")!} />
+              )}
+
+              {showPackageDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowPackageDropdown(false)} />
+                  <div className="absolute left-0 top-full z-50 mt-1 w-full rounded-lg border border-zinc-200 bg-white shadow-lg max-h-48 overflow-y-auto">
+                    <input
+                      type="text"
+                      placeholder="Ketik manual..."
+                      value={packageName}
+                      onChange={(e) => {
+                        setPackageId("");
+                        setPackageName(e.target.value);
+                      }}
+                      className="w-full border-b border-zinc-200 px-3 py-2 text-sm focus:outline-none"
+                      autoFocus
+                    />
+                    {packages.length === 0 ? (
+                      <p className="px-3 py-2 text-sm text-zinc-400">Tidak ada paket</p>
+                    ) : (
+                      packages.map((pkg) => (
+                        <button
+                          key={pkg.id}
+                          type="button"
+                          onClick={() => selectPackage(pkg)}
+                          className={`w-full px-3 py-2 text-left text-sm hover:bg-zinc-50 flex items-center justify-between ${
+                            pkg.id === packageId ? "bg-blue-50" : ""
+                          }`}
+                        >
+                          <div>
+                            <span className="font-medium text-zinc-900">{pkg.name}</span>
+                            <span className="ml-2 text-zinc-500 text-xs">
+                              {pkg.destination} · {pkg.duration}
+                            </span>
+                          </div>
+                          <span className="text-xs text-zinc-400">
+                            {formatCurrency(pkg.price)}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
               )}
             </div>
 
             <div>
-              <Label
-                htmlFor="departure_date"
-                error={!!getError("departure_date")}
-              >
+              <Label htmlFor="departure_date" error={!!getError("departure_date")}>
                 Tanggal Keberangkatan
               </Label>
               <input
@@ -190,10 +250,7 @@ export function BookingFormDialog({
             </div>
 
             <div>
-              <Label
-                htmlFor="price_per_person"
-                error={!!getError("price_per_person")}
-              >
+              <Label htmlFor="price_per_person" error={!!getError("price_per_person")}>
                 Harga Per Orang (Rp)
               </Label>
               <input

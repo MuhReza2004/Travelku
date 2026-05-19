@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import type { BookingStatus } from "@/lib/types";
+import { createAuditLog, getStaffRole } from "@/lib/helpers/audit";
 
 const VALID_STATUSES: BookingStatus[] = [
   "Menunggu",
@@ -28,17 +29,25 @@ export async function PATCH(
     return NextResponse.json({ error: "Status tidak valid" }, { status: 400 });
   }
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const role = await getStaffRole(supabase, user.id);
+
   const { data: booking, error: fetchError } = await supabase
     .from("bookings")
-    .select("status")
+    .select("status, created_by")
     .eq("id", id)
     .single();
 
   if (fetchError || !booking) {
-    return NextResponse.json(
-      { error: "Pemesanan tidak ditemukan" },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Pemesanan tidak ditemukan" }, { status: 404 });
+  }
+
+  if (role !== "admin" && booking.created_by !== user.id) {
+    return NextResponse.json({ error: "Anda tidak memiliki akses" }, { status: 403 });
   }
 
   const currentStatus = booking.status as BookingStatus;
@@ -66,6 +75,11 @@ export async function PATCH(
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
+
+  await createAuditLog(supabase, id, user.id, "status_changed", {
+    from: currentStatus,
+    to: newStatus,
+  });
 
   return NextResponse.json({ data });
 }

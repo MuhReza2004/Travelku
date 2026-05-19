@@ -9,6 +9,7 @@ interface BookingTableProps {
   onEdit: (booking: Booking) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: BookingStatus) => void;
+  onViewLogs?: (booking: Booking) => void;
   statusLoading?: boolean;
 }
 
@@ -17,6 +18,7 @@ export function BookingTable({
   onEdit,
   onDelete,
   onStatusChange,
+  onViewLogs,
   statusLoading,
 }: BookingTableProps) {
   if (bookings.length === 0) {
@@ -83,6 +85,14 @@ export function BookingTable({
                 </Td>
                 <Td className="text-right">
                   <div className="flex justify-end gap-1">
+                    {onViewLogs && (
+                      <button
+                        onClick={() => onViewLogs(booking)}
+                        className="rounded px-2 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+                      >
+                        Log
+                      </button>
+                    )}
                     <button
                       onClick={() => onEdit(booking)}
                       className="rounded px-2 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50"

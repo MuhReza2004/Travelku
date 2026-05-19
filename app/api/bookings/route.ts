@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { validateBooking } from "@/lib/validation";
+import { checkPackageCapacity, createAuditLog } from "@/lib/helpers/audit";
+import { resolvePackage } from "@/lib/helpers/package";
 
 const PAGE_SIZE = 20;
 
@@ -66,9 +68,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const supabase = await createServerSupabase();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -81,12 +81,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Validasi gagal", errors }, { status: 400 });
   }
 
+  const resolved = await resolvePackage(
+    supabase,
+    body.package_id,
+    body.package_name,
+    Number(body.price_per_person)
+  );
+
+  if (resolved.package_id) {
+    const capacityError = await checkPackageCapacity(
+      supabase,
+      resolved.package_id,
+      body.departure_date,
+      Number(body.participants)
+    );
+    if (capacityError) {
+      return NextResponse.json(
+        { error: capacityError, errors: [{ field: "participants", message: capacityError }] },
+        { status: 400 }
+      );
+    }
+  }
+
   const { data, error } = await supabase
     .from("bookings")
     .insert({
       customer_name: body.customer_name.trim(),
       contact: body.contact.trim(),
-      package_name: body.package_name.trim(),
+      package_id: resolved.package_id,
+      package_name: resolved.package_name,
       departure_date: body.departure_date,
       participants: Number(body.participants),
       price_per_person: Number(body.price_per_person),
@@ -100,6 +123,8 @@ export async function POST(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  await createAuditLog(supabase, data.id, user.id, "created");
 
   return NextResponse.json({ data }, { status: 201 });
 }

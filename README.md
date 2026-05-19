@@ -1,6 +1,6 @@
 # TravelKu — Sistem Internal Manajemen Pemesanan Paket Wisata
 
-TravelKu adalah sistem internal berbasis web untuk agen perjalanan. Staf agen dapat mencatat, memfilter, mengubah status, dan mengekspor pemesanan paket wisata pelanggan.
+TravelKu adalah sistem internal berbasis web untuk agen perjalanan. Staf agen dapat mencatat, memfilter, mengubah status, mengelola paket wisata, dan mengekspor pemesanan pelanggan.
 
 ---
 
@@ -27,9 +27,9 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxx
 
 # 4. Jalankan migrasi database
-#    Buka Supabase Dashboard → SQL Editor → paste isi supabase/migrations/0001_create_bookings.sql → Run
+#    Buka Supabase Dashboard → SQL Editor → paste isi supabase/migrations/0002_add_packages_audit_roles.sql → Run
 
-# 5. (Opsional) Nonaktifkan email confirmation
+# 5. Nonaktifkan email confirmation
 #    Supabase Dashboard → Authentication → Settings → Disable "Confirm email"
 
 # 6. Jalankan dev server
@@ -72,6 +72,27 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 ---
 
+## REST API
+
+| Method | Path | Auth | Deskripsi |
+|--------|------|------|-----------|
+| POST | `/api/auth/register` | ✗ | Daftar staf baru |
+| POST | `/api/auth/login` | ✗ | Login (set session cookie) |
+| POST | `/api/auth/logout` | ✓ | Hapus session |
+| GET | `/api/auth/me` | ✓ | Profile staf saat ini |
+| GET | `/api/bookings` | ✓ | List booking (filter, search, pagination via query params) |
+| POST | `/api/bookings` | ✓ | Buat booking baru |
+| GET | `/api/bookings/[id]` | ✓ | Detail booking |
+| PUT | `/api/bookings/[id]` | ✓ | Update booking (hanya admin atau pemilik) |
+| DELETE | `/api/bookings/[id]` | ✓ | Hapus booking (hanya admin atau pemilik) |
+| PATCH | `/api/bookings/[id]/status` | ✓ | Ubah status (validasi flow) |
+| GET | `/api/packages` | ✓ | List paket wisata |
+| POST | `/api/packages` | ✓ | Buat paket (admin only) |
+| PUT | `/api/packages/[id]` | ✓ | Update paket (admin only) |
+| DELETE | `/api/packages/[id]` | ✓ | Hapus paket (admin only) |
+
+---
+
 ## Daftar Fitur
 
 ### ✅ Selesai
@@ -84,6 +105,7 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Proteksi rute via Edge Middleware
 - [x] RLS (Row-Level Security) di database
 - [x] Error handling pesan asli dari server (tidak hardcode)
+- [x] Role staf: admin dan staff — disimpan di tabel `staff`
 
 **Manajemen Pemesanan (CRUD)**
 - [x] Tambah pemesanan baru — otomatis status "Menunggu"
@@ -105,6 +127,22 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Count per status
 - [x] Semua ringkasan mengikuti filter aktif
 
+**Paket Wisata**
+- [x] CRUD paket wisata (admin: semua; staff: read-only)
+- [x] Tabel paket dengan daftar, harga, kapasitas
+- [x] Dropdown pemilihan paket di form booking (auto-fill harga)
+- [x] Validasi kapasitas paket sebelum booking (menghitung all confirmed bookings)
+
+**Audit Log**
+- [x] Riwayat siapa membuat/mengubah/menghapus booking
+- [x] Catat perubahan sebelum/sesudah tiap update
+- [x] Log otomatis untuk tiap transisi status
+
+**Role & Akses**
+- [x] Admin: akses penuh ke semua fitur termasuk CRUD paket
+- [x] Staff: hanya bisa edit/hapus booking milik sendiri
+- [x] Status change: admin bisa ubah status booking siapa pun, staff hanya booking sendiri
+
 **Lain-lain**
 - [x] Validasi input sisi server (peserta ≥ 1, harga ≥ 0, tanggal tidak lampau, kontak wajib)
 - [x] Pagination (20 per halaman)
@@ -113,10 +151,6 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 ### ❌ Belum
 
-- [ ] Modul Paket Wisata terpisah (relasi antar tabel)
-- [ ] Validasi kapasitas paket (kuota)
-- [ ] Riwayat siapa membuat/mengubah pemesanan (audit log)
-- [ ] Role / level akses staf
 - [ ] Unit test / integration test
 - [ ] CI/CD pipeline
 
@@ -124,18 +158,36 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 
 ## Asumsi & Keputusan Teknis
 
-1. **Semua staf bisa mengelola semua pemesanan.** Tidak ada pembatasan akses per staf. `created_by` tetap dicatat untuk referensi tapi tidak membatasi aksi.
+1. **Session dikelola via cookie (`@supabase/ssr`), bukan JWT di localStorage.** Cookie lebih aman dari XSS dan middleware bisa membaca cookie langsung tanpa JavaScript.
 
-2. **Tidak ada modul Paket Wisata terpisah.** Nama paket diinput manual sebagai teks bebas. Ini menyederhanakan MVP. Modul paket bisa ditambahkan nanti sebagai tabel relasi.
+2. **Email confirmation di Supabase harus dinonaktifkan** agar registrasi langsung login tanpa verifikasi email. Jika tidak dinonaktifkan, setelah registrasi user harus login manual.
 
-3. **Session dikelola via cookie (`@supabase/ssr`), bukan JWT di localStorage.** Cookie lebih aman dari XSS dan middleware bisa membaca cookie langsung tanpa JavaScript.
+3. **RLS (Row-Level Security) aktif** di semua tabel. Policies mengizinkan semua staf terautentikasi untuk membaca/menulis. Anon key tidak bisa mengakses data apa pun.
 
-4. **Email confirmation di Supabase harus dinonaktifkan** agar registrasi langsung login tanpa verifikasi email. Jika tidak dinonaktifkan, setelah registrasi user harus login manual.
+4. **Tidak menggunakan Server Actions.** Seluruh komunikasi FE–BE melalui REST API (`/api/*`) dengan format JSON, agar arsitektur lebih jelas dan mudah diganti frontend-nya di masa depan.
 
-5. **RLS (Row-Level Security) aktif** di semua tabel. Policies mengizinkan semua staf terautentikasi untuk membaca/menulis. Anon key tidak bisa mengakses data apa pun.
+5. **Pagination 20 per halaman.** Ukuran halaman bisa diubah via query parameter `page_size` (maks 100).
 
-6. **Tidak menggunakan Server Actions.** Seluruh komunikasi FE–BE melalui REST API (`/api/*`) dengan format JSON, agar arsitektur lebih jelas dan mudah diganti frontend-nya di masa depan.
+6. **Tidak ada test framework.** Belum ada unit test atau integration test. Disarankan menambahkan Vitest + Playwright untuk proyek production.
 
-7. **Tidak ada test framework.** Belum ada unit test atau integration test. Disarankan menambahkan Vitest + Playwright untuk proyek production.
+---
 
-8. **Pagination 20 per halaman.** Ukuran halaman bisa diubah via query parameter `page_size` (maks 100).
+## Struktur File Penting
+
+```
+supabase/migrations/0002_add_packages_audit_roles.sql   -- Semua migrasi DB
+lib/types.ts                                             -- Shared TypeScript types
+lib/helpers/audit.ts                                     -- Audit log + capacity check + role check
+lib/api/client.ts                                        -- Fetch wrapper (error handling, 401 redirect)
+lib/supabase/server.ts                                   -- Supabase client untuk API routes
+app/api/bookings/route.ts                                -- GET (list) / POST booking
+app/api/bookings/[id]/route.ts                           -- GET / PUT / DELETE booking
+app/api/bookings/[id]/status/route.ts                    -- PATCH status booking
+app/api/packages/route.ts                                -- GET (list) / POST package
+app/api/packages/[id]/route.ts                           -- GET / PUT / DELETE package
+app/api/auth/*                                           -- Login, register, logout, me
+middleware.ts                                            -- Edge Middleware (auth guard)
+app/page.tsx                                             -- Dashboard utama (tabs: Pemesanan / Paket Wisata)
+components/bookings/                                     -- Booking UI (table, form, filters, etc.)
+components/packages/                                     -- Package UI (tab, form dialog, etc.)
+```
