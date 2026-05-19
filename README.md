@@ -52,7 +52,6 @@ npm run dev
 | `npm run test:api`    | API integration test            |
 | `npm run test:e2e`    | E2E test (Playwright, headless) |
 | `npm run test:e2e:ui` | E2E test (with browser)         |
-| `npm run ci`          | Type-check + lint + unit test   |
 
 ---
 
@@ -163,19 +162,13 @@ Tidak ada server action atau akses Supabase langsung dari UI. Semua komunikasi d
 - [x] Export daftar ke XLSX (format tabel, bold header, border, rata kanan harga)
 - [x] Tampilan responsive (mobile-friendly)
 
-### ✅ Testing & CI/CD
+### ✅ Testing
 
 - [x] Unit test utils & validasi (20 test, Vitest, tanpa server)
 - [x] Integration test API endpoints (18 test via HTTP, skip otomatis jika server mati)
 - [x] End-to-end test dengan Playwright (register → login → booking → status)
-- [x] GitHub Actions CI (type-check + lint + unit test tiap push/PR ke main)
-- [x] Deploy preview otomatis di Vercel dari PR
 
 [travelku-seven.vercel.app](https://travelku-seven.vercel.app/auth/login) — domain deploy
-
-> **Catatan CI:** E2E test butuh `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.  
-> Tambahkan sebagai **Environment variables** di GitHub:  
-> Settings → Secrets and variables → Actions → Variables → `NEXT_PUBLIC_SUPABASE_URL` dan `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 ---
 
